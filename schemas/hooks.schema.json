@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cursor hooks.json",
+  "description": "Cursor Hooks configuration. Sources: enterprise > team > project (.cursor/hooks.json) > user (~/.cursor/hooks.json). Docs: https://cursor.com/docs/hooks",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Config schema version. Positive integer; use 1."
+    },
+    "hooks": {
+      "type": "object",
+      "description": "Maps hook event names to ordered arrays of hook definitions.",
+      "properties": {
+        "sessionStart": {
+          "type": "array",
+          "description": "Composer conversation created. Fire-and-forget; may return `env` and `additional_context`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "sessionEnd": {
+          "type": "array",
+          "description": "Composer conversation ended. Fire-and-forget.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "preToolUse": {
+          "type": "array",
+          "description": "Before any tool runs. Matcher: tool type (Shell, Read, Write, Grep, Delete, Task, MCP:<tool_name>).",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "postToolUse": {
+          "type": "array",
+          "description": "After a successful tool run. Matcher: tool type.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "postToolUseFailure": {
+          "type": "array",
+          "description": "Tool failed / timed out / denied. Matcher: tool type.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "subagentStart": {
+          "type": "array",
+          "description": "Before a subagent (Task) spawns. Matcher: subagent type (generalPurpose, explore, shell, ...).",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "subagentStop": {
+          "type": "array",
+          "description": "Subagent completed / errored / aborted. Matcher: subagent type. Supports `loop_limit`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHookWithLoop"
+              },
+              {
+                "$ref": "#/$defs/promptHookWithLoop"
+              }
+            ]
+          }
+        },
+        "beforeShellExecution": {
+          "type": "array",
+          "description": "Before a shell command. Matcher: full command string.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "afterShellExecution": {
+          "type": "array",
+          "description": "After a shell command. Matcher: full command string.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "beforeMCPExecution": {
+          "type": "array",
+          "description": "Before an MCP tool call. `failClosed: true` recommended.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "afterMCPExecution": {
+          "type": "array",
+          "description": "After an MCP tool call.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "beforeReadFile": {
+          "type": "array",
+          "description": "Before Agent reads a file. Matcher value: `Read`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "afterFileEdit": {
+          "type": "array",
+          "description": "After Agent edits a file. Matcher value: `Write`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "beforeSubmitPrompt": {
+          "type": "array",
+          "description": "After send, before backend request. Matcher value: `UserPromptSubmit`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "preCompact": {
+          "type": "array",
+          "description": "Before context compaction. Observational.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "stop": {
+          "type": "array",
+          "description": "Agent loop ended; may return `followup_message`. Matcher value: `Stop`. Supports `loop_limit`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHookWithLoop"
+              },
+              {
+                "$ref": "#/$defs/promptHookWithLoop"
+              }
+            ]
+          }
+        },
+        "afterAgentResponse": {
+          "type": "array",
+          "description": "After assistant message. Matcher value: `AgentResponse`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "afterAgentThought": {
+          "type": "array",
+          "description": "After thinking block. Matcher value: `AgentThought`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "beforeTabFileRead": {
+          "type": "array",
+          "description": "Before Tab reads a file. Matcher value: `TabRead`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "afterTabFileEdit": {
+          "type": "array",
+          "description": "After Tab edits a file. Matcher value: `TabWrite`.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        },
+        "workspaceOpen": {
+          "type": "array",
+          "description": "Workspace opened / folders changed. May return `pluginPaths`. Not run in cloud agents.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/commandHook"
+              },
+              {
+                "$ref": "#/$defs/promptHook"
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "commandHook": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "type": {
+          "const": "command",
+          "default": "command",
+          "description": "Hook execution type."
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Shell string, absolute path, or relative path. Project hooks: relative to project root. User hooks: relative to ~/.cursor/."
+        },
+        "timeout": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Execution timeout in seconds. Platform default if omitted."
+        },
+        "failClosed": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, crash/timeout/non-zero exit/no output blocks the action. Permission hooks block on invalid JSON regardless."
+        },
+        "matcher": {
+          "type": "string",
+          "description": "Regex filter. Empty string or \"*\" matches everything. Tested against a value that depends on the hook event."
+        }
+      },
+      "additionalProperties": false
+    },
+    "promptHook": {
+      "type": "object",
+      "required": ["type", "prompt"],
+      "properties": {
+        "type": {
+          "const": "prompt",
+          "description": "LLM-evaluated hook. Returns { ok: boolean, reason?: string }. Not supported in cloud agents."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Natural-language condition. $ARGUMENTS is replaced by hook input JSON (auto-appended if absent)."
+        },
+        "model": {
+          "type": "string",
+          "description": "Override the default LLM."
+        },
+        "timeout": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Execution timeout in seconds. Platform default if omitted."
+        },
+        "failClosed": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, crash/timeout/non-zero exit/no output blocks the action. Permission hooks block on invalid JSON regardless."
+        },
+        "matcher": {
+          "type": "string",
+          "description": "Regex filter. Empty string or \"*\" matches everything. Tested against a value that depends on the hook event."
+        }
+      },
+      "additionalProperties": false
+    },
+    "commandHookWithLoop": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "type": {
+          "const": "command",
+          "default": "command",
+          "description": "Hook execution type."
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Shell string, absolute path, or relative path. Project hooks: relative to project root. User hooks: relative to ~/.cursor/."
+        },
+        "timeout": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Execution timeout in seconds. Platform default if omitted."
+        },
+        "failClosed": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, crash/timeout/non-zero exit/no output blocks the action. Permission hooks block on invalid JSON regardless."
+        },
+        "matcher": {
+          "type": "string",
+          "description": "Regex filter. Empty string or \"*\" matches everything. Tested against a value that depends on the hook event."
+        },
+        "loop_limit": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "default": 5,
+          "description": "Max auto follow-ups for stop/subagentStop. null = unlimited. Default 5."
+        }
+      },
+      "additionalProperties": false
+    },
+    "promptHookWithLoop": {
+      "type": "object",
+      "required": ["type", "prompt"],
+      "properties": {
+        "type": {
+          "const": "prompt",
+          "description": "LLM-evaluated hook. Returns { ok: boolean, reason?: string }. Not supported in cloud agents."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Natural-language condition. $ARGUMENTS is replaced by hook input JSON (auto-appended if absent)."
+        },
+        "model": {
+          "type": "string",
+          "description": "Override the default LLM."
+        },
+        "timeout": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Execution timeout in seconds. Platform default if omitted."
+        },
+        "failClosed": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, crash/timeout/non-zero exit/no output blocks the action. Permission hooks block on invalid JSON regardless."
+        },
+        "matcher": {
+          "type": "string",
+          "description": "Regex filter. Empty string or \"*\" matches everything. Tested against a value that depends on the hook event."
+        },
+        "loop_limit": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "default": 5,
+          "description": "Max auto follow-ups for stop/subagentStop. null = unlimited. Default 5."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

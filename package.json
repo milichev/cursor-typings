@@ -1,0 +1,50 @@
+{
+  "name": "@vadymecum/cursor-typings",
+  "version": "0.1.2",
+  "description": "TypeScript types and JSON Schema for Cursor",
+  "keywords": [
+    "cursor",
+    "hooks",
+    "json-schema",
+    "schemas",
+    "types",
+    "typescript",
+    "typings"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/milichev/cursor-typings.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Vadym Milichev",
+    "email": "vadym.milichev@gmail.com",
+    "url": "https://github.com/milichev"
+  },
+  "license": "MIT",
+  "type": "module",
+  "types": "./hooks.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts"
+    },
+    "./hooks.schema.json": "./schemas/hooks.schema.json",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./types/index.d.ts",
+        "./types/hooks.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "types/index.d.ts",
+    "types/hooks.d.ts",
+    "schemas/hooks.schema.json"
+  ],
+  "sideEffects": false
+}
